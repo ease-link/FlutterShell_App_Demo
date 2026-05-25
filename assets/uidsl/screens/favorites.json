@@ -1,0 +1,94 @@
+{
+  "name": "Favorites",
+  "root": {
+    "id": "root",
+    "type": "column",
+    "props": {
+      "background": "#F3F3F3",
+      "padding": {
+        "bottom": 20,
+        "top": 20,
+        "right": 20,
+        "left": 20
+      },
+      "crossAxisAlignment": "start"
+    },
+    "children": [
+      {
+        "id": "title",
+        "type": "text",
+        "bind": "favoritesCount",
+        "props": {
+          "value": "You have {{favoritesCount}} favorites:",
+          "style": {
+            "color": "#1C1B1F",
+            "fontSize": 18,
+            "weight": "bold"
+          }
+        },
+        "children": []
+      },
+      {
+        "id": "sp1",
+        "type": "vspacer",
+        "props": {
+          "height": 16
+        },
+        "children": []
+      },
+      {
+        "id": "favorites_list",
+        "type": "list_view",
+        "bind": "favorites",
+        "props": {
+          "item_template": {
+            "type": "row",
+            "props": {
+              "padding": {
+                "bottom": 8,
+                "top": 8
+              },
+              "crossAxisAlignment": "center"
+            },
+            "children": [
+              {
+                "children": [],
+                "id": "fav_icon",
+                "type": "icon",
+                "props": {
+                  "name": "favorite",
+                  "color": "#6750A4",
+                  "size": 20
+                }
+              },
+              {
+                "type": "hspacer",
+                "props": {
+                  "width": 12
+                },
+                "children": [],
+                "id": "fav_sp"
+              },
+              {
+                "id": "fav_text",
+                "bind": ".",
+                "children": [],
+                "props": {
+                  "value": "{{.}}",
+                  "style": {
+                    "color": "#1C1B1F",
+                    "fontSize": 14
+                  }
+                },
+                "type": "text"
+              }
+            ],
+            "id": "fav_item"
+          },
+          "shrinkWrap": true
+        },
+        "children": []
+      }
+    ]
+  }
+}

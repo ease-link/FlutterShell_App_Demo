@@ -1,0 +1,465 @@
+{
+  "name": "ShellApp_Codelabs",
+  "version": "1.0.0",
+  "entry": "shellapp_welcome",
+  "screens": {
+    "main": {
+      "name": "Main",
+      "scrollable": false,
+      "root": {
+        "id": "root",
+        "type": "navigation_rail",
+        "bind": "selectedNavIndex",
+        "props": {
+          "background": "#E8DEF8",
+          "action": {
+            "name": "selectNav",
+            "type": "action"
+          },
+          "destinations": [
+            {
+              "icon": "home",
+              "label": "Home"
+            },
+            {
+              "icon": "favorite",
+              "label": "Favorites"
+            }
+          ],
+          "selectedIndex": 0
+        },
+        "children": [
+          {
+            "id": "generator_page",
+            "type": "column",
+            "props": {
+              "mainAxisAlignment": "center",
+              "background": "#F3F3F3",
+              "crossAxisAlignment": "center",
+              "padding": {
+                "right": 20,
+                "left": 20
+              }
+            },
+            "children": [
+              {
+                "id": "hint",
+                "type": "text",
+                "props": {
+                  "value": "A random idea:",
+                  "style": {
+                    "color": "#49454F",
+                    "fontSize": 14
+                  }
+                },
+                "children": []
+              },
+              {
+                "id": "sp1",
+                "type": "vspacer",
+                "props": {
+                  "height": 16
+                },
+                "children": []
+              },
+              {
+                "id": "big_card",
+                "type": "card",
+                "props": {
+                  "elevation": 4,
+                  "padding": {
+                    "left": 32,
+                    "top": 20,
+                    "right": 32,
+                    "bottom": 20
+                  },
+                  "borderRadius": 12,
+                  "color": "#6750A4"
+                },
+                "children": [
+                  {
+                    "id": "word_pair",
+                    "type": "text",
+                    "bind": "currentWord",
+                    "props": {
+                      "value": "{{currentWord}}",
+                      "style": {
+                        "weight": "bold",
+                        "letterSpacing": 1.5,
+                        "fontSize": 28,
+                        "color": "#F3EFF4"
+                      }
+                    },
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "id": "sp2",
+                "type": "vspacer",
+                "props": {
+                  "height": 24
+                },
+                "children": []
+              },
+              {
+                "id": "buttons_row",
+                "type": "row",
+                "props": {
+                  "mainAxisAlignment": "center"
+                },
+                "children": [
+                  {
+                    "id": "like_btn",
+                    "type": "button",
+                    "props": {
+                      "label": "Like",
+                      "action": {
+                        "name": "toggleFavorite",
+                        "type": "action"
+                      },
+                      "variant": "elevated",
+                      "icon": "favorite"
+                    },
+                    "children": []
+                  },
+                  {
+                    "id": "sp3",
+                    "type": "hspacer",
+                    "props": {
+                      "width": 16
+                    },
+                    "children": []
+                  },
+                  {
+                    "id": "next_btn",
+                    "type": "button",
+                    "props": {
+                      "variant": "elevated",
+                      "action": {
+                        "name": "getNext",
+                        "type": "action"
+                      },
+                      "label": "Next",
+                      "icon": "skip_next"
+                    },
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "favorites_page",
+            "type": "column",
+            "props": {
+              "background": "#F3F3F3",
+              "padding": {
+                "right": 20,
+                "top": 20,
+                "left": 20,
+                "bottom": 20
+              },
+              "crossAxisAlignment": "start"
+            },
+            "children": [
+              {
+                "id": "fav_title",
+                "type": "text",
+                "bind": "favoritesCount",
+                "props": {
+                  "style": {
+                    "color": "#1C1B1F",
+                    "weight": "bold",
+                    "fontSize": 18
+                  },
+                  "value": "You have {{favoritesCount}} favorites:"
+                },
+                "children": []
+              },
+              {
+                "id": "sp_fav",
+                "type": "vspacer",
+                "props": {
+                  "height": 16
+                },
+                "children": []
+              },
+              {
+                "id": "favorites_list",
+                "type": "list_view",
+                "bind": "favorites",
+                "props": {
+                  "item_template": {
+                    "type": "row",
+                    "props": {
+                      "padding": {
+                        "bottom": 8,
+                        "top": 8
+                      },
+                      "crossAxisAlignment": "center"
+                    },
+                    "children": [
+                      {
+                        "children": [],
+                        "id": "fav_icon",
+                        "type": "icon",
+                        "props": {
+                          "name": "favorite",
+                          "size": 20,
+                          "color": "#6750A4"
+                        }
+                      },
+                      {
+                        "props": {
+                          "width": 12
+                        },
+                        "type": "hspacer",
+                        "id": "fav_sp",
+                        "children": []
+                      },
+                      {
+                        "props": {
+                          "value": "{{.}}",
+                          "style": {
+                            "fontSize": 14,
+                            "color": "#1C1B1F"
+                          }
+                        },
+                        "type": "text",
+                        "id": "fav_text",
+                        "children": [],
+                        "bind": "."
+                      }
+                    ],
+                    "id": "fav_item"
+                  },
+                  "shrinkWrap": true
+                },
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "generator": {
+      "name": "Generator",
+      "scrollable": false,
+      "root": {
+        "id": "root",
+        "type": "column",
+        "props": {
+          "padding": {
+            "left": 20,
+            "right": 20
+          },
+          "crossAxisAlignment": "center",
+          "mainAxisAlignment": "center",
+          "background": "#F3F3F3"
+        },
+        "children": [
+          {
+            "id": "hint",
+            "type": "text",
+            "props": {
+              "value": "A random idea:",
+              "style": {
+                "fontSize": 14,
+                "color": "#49454F"
+              }
+            },
+            "children": []
+          },
+          {
+            "id": "sp1",
+            "type": "vspacer",
+            "props": {
+              "height": 16
+            },
+            "children": []
+          },
+          {
+            "id": "big_card",
+            "type": "card",
+            "props": {
+              "padding": {
+                "left": 32,
+                "right": 32,
+                "top": 20,
+                "bottom": 20
+              },
+              "borderRadius": 12,
+              "elevation": 4,
+              "color": "#6750A4"
+            },
+            "children": [
+              {
+                "id": "word_pair",
+                "type": "text",
+                "bind": "currentWord",
+                "props": {
+                  "value": "{{currentWord}}",
+                  "style": {
+                    "weight": "bold",
+                    "fontSize": 28,
+                    "letterSpacing": 1.5,
+                    "color": "#F3EFF4"
+                  }
+                },
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "sp2",
+            "type": "vspacer",
+            "props": {
+              "height": 24
+            },
+            "children": []
+          },
+          {
+            "id": "buttons_row",
+            "type": "row",
+            "props": {
+              "mainAxisAlignment": "center"
+            },
+            "children": [
+              {
+                "id": "like_btn",
+                "type": "button",
+                "props": {
+                  "label": "Like",
+                  "action": {
+                    "name": "toggleFavorite",
+                    "type": "action"
+                  },
+                  "variant": "elevated",
+                  "icon": "favorite"
+                },
+                "children": []
+              },
+              {
+                "id": "sp3",
+                "type": "hspacer",
+                "props": {
+                  "width": 16
+                },
+                "children": []
+              },
+              {
+                "id": "next_btn",
+                "type": "button",
+                "props": {
+                  "variant": "elevated",
+                  "label": "Next",
+                  "action": {
+                    "name": "getNext",
+                    "type": "action"
+                  },
+                  "icon": "skip_next"
+                },
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "favorites": {
+      "name": "Favorites",
+      "root": {
+        "id": "root",
+        "type": "column",
+        "props": {
+          "background": "#F3F3F3",
+          "padding": {
+            "bottom": 20,
+            "top": 20,
+            "right": 20,
+            "left": 20
+          },
+          "crossAxisAlignment": "start"
+        },
+        "children": [
+          {
+            "id": "title",
+            "type": "text",
+            "bind": "favoritesCount",
+            "props": {
+              "value": "You have {{favoritesCount}} favorites:",
+              "style": {
+                "color": "#1C1B1F",
+                "fontSize": 18,
+                "weight": "bold"
+              }
+            },
+            "children": []
+          },
+          {
+            "id": "sp1",
+            "type": "vspacer",
+            "props": {
+              "height": 16
+            },
+            "children": []
+          },
+          {
+            "id": "favorites_list",
+            "type": "list_view",
+            "bind": "favorites",
+            "props": {
+              "item_template": {
+                "type": "row",
+                "props": {
+                  "padding": {
+                    "bottom": 8,
+                    "top": 8
+                  },
+                  "crossAxisAlignment": "center"
+                },
+                "children": [
+                  {
+                    "children": [],
+                    "id": "fav_icon",
+                    "type": "icon",
+                    "props": {
+                      "name": "favorite",
+                      "color": "#6750A4",
+                      "size": 20
+                    }
+                  },
+                  {
+                    "type": "hspacer",
+                    "props": {
+                      "width": 12
+                    },
+                    "children": [],
+                    "id": "fav_sp"
+                  },
+                  {
+                    "id": "fav_text",
+                    "bind": ".",
+                    "children": [],
+                    "props": {
+                      "value": "{{.}}",
+                      "style": {
+                        "color": "#1C1B1F",
+                        "fontSize": 14
+                      }
+                    },
+                    "type": "text"
+                  }
+                ],
+                "id": "fav_item"
+              },
+              "shrinkWrap": true
+            },
+            "children": []
+          }
+        ]
+      }
+    }
+  }
+}

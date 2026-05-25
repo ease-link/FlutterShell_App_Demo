@@ -1,0 +1,24 @@
+name: myapp
+description: ShellApp クライアントテンプレート — UIDSL 駆動の Flutter アプリ雛形
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  shellapp_runtime:
+    path: ./shellapp_runtime
+  http: any
+  shared_preferences: any
+  font_awesome_flutter: any
+  flutter_svg: any
+  google_fonts: any
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/uidsl/screens/
+    - assets/license.jwt

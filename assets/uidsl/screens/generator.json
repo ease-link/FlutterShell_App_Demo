@@ -1,0 +1,124 @@
+{
+  "name": "Generator",
+  "scrollable": false,
+  "root": {
+    "id": "root",
+    "type": "column",
+    "props": {
+      "padding": {
+        "left": 20,
+        "right": 20
+      },
+      "crossAxisAlignment": "center",
+      "mainAxisAlignment": "center",
+      "background": "#F3F3F3"
+    },
+    "children": [
+      {
+        "id": "hint",
+        "type": "text",
+        "props": {
+          "value": "A random idea:",
+          "style": {
+            "fontSize": 14,
+            "color": "#49454F"
+          }
+        },
+        "children": []
+      },
+      {
+        "id": "sp1",
+        "type": "vspacer",
+        "props": {
+          "height": 16
+        },
+        "children": []
+      },
+      {
+        "id": "big_card",
+        "type": "card",
+        "props": {
+          "padding": {
+            "left": 32,
+            "right": 32,
+            "top": 20,
+            "bottom": 20
+          },
+          "borderRadius": 12,
+          "elevation": 4,
+          "color": "#6750A4"
+        },
+        "children": [
+          {
+            "id": "word_pair",
+            "type": "text",
+            "bind": "currentWord",
+            "props": {
+              "value": "{{currentWord}}",
+              "style": {
+                "weight": "bold",
+                "fontSize": 28,
+                "letterSpacing": 1.5,
+                "color": "#F3EFF4"
+              }
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "sp2",
+        "type": "vspacer",
+        "props": {
+          "height": 24
+        },
+        "children": []
+      },
+      {
+        "id": "buttons_row",
+        "type": "row",
+        "props": {
+          "mainAxisAlignment": "center"
+        },
+        "children": [
+          {
+            "id": "like_btn",
+            "type": "button",
+            "props": {
+              "label": "Like",
+              "action": {
+                "name": "toggleFavorite",
+                "type": "action"
+              },
+              "variant": "elevated",
+              "icon": "favorite"
+            },
+            "children": []
+          },
+          {
+            "id": "sp3",
+            "type": "hspacer",
+            "props": {
+              "width": 16
+            },
+            "children": []
+          },
+          {
+            "id": "next_btn",
+            "type": "button",
+            "props": {
+              "variant": "elevated",
+              "label": "Next",
+              "action": {
+                "name": "getNext",
+                "type": "action"
+              },
+              "icon": "skip_next"
+            },
+            "children": []
+          }
+        ]
+      }
+    ]
+  }
+}
