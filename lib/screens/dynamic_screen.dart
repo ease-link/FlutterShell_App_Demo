@@ -5,15 +5,16 @@ import 'package:shellapp_runtime/shellapp_runtime.dart';
 import '../shellapp/widget_factory_lite.dart';
 import '../actions/app_actions.dart';
 
-class FavoritesScreen extends StatefulWidget {
-  const FavoritesScreen({super.key});
+class DynamicScreen extends StatefulWidget {
+  final String screenName;
+  const DynamicScreen({required this.screenName, super.key});
   @override
-  State<FavoritesScreen> createState() => _FavoritesScreenState();
+  State<DynamicScreen> createState() => _DynamicScreenState();
 }
 
-class _FavoritesScreenState extends State<FavoritesScreen> {
+class _DynamicScreenState extends State<DynamicScreen> {
   Map<String, dynamic>? _resolvedWidget;
-  final Map<String, dynamic> _state = {};
+  Map<String, dynamic> _state = {};
   bool _scrollable = true;
   String? _error;
 
@@ -25,12 +26,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   Future<void> _load() async {
     try {
-      final uidslStr =
-          await rootBundle.loadString('assets/uidsl/screens/favorites.json');
-      final json     = jsonDecode(uidslStr) as Map<String, dynamic>;
-      final uidsl    = (json['root'] ?? json) as Map<String, dynamic>;
+      final uidslStr = await rootBundle
+          .loadString('assets/uidsl/screens/${widget.screenName}.json');
+      final json       = jsonDecode(uidslStr) as Map<String, dynamic>;
+      final uidsl      = (json['root'] ?? json) as Map<String, dynamic>;
       final scrollable = (json['scrollable'] as bool?) ?? true;
-      final result   = ShellAppRuntime.execute(uidsl: uidsl, state: _state);
+      final result     = ShellAppRuntime.execute(uidsl: uidsl, state: _state);
       if (result.ok && result.widget != null) {
         setState(() {
           _resolvedWidget = result.widget;
