@@ -28,6 +28,28 @@ class _DynamicScreenState extends State<DynamicScreen> {
 
   Future<void> _load() async {
     try {
+      // ──────────────────────────────────────────────────────────
+      // [Optional] Load UIDSL from a remote server instead of bundled assets.
+      // Place the JSON files from assets/uidsl/screens/ on your server and
+      // UI changes will be reflected instantly without any app update.
+      //
+      // import 'package:http/http.dart' as http;
+      // const _uidslBaseUrl = 'https://your-server.com/uidsl';
+      //
+      // String uidslStr;
+      // try {
+      //   final res = await http.get(
+      //     Uri.parse('$_uidslBaseUrl/screens/${widget.screenName}.json'),
+      //   ).timeout(const Duration(seconds: 5));
+      //   uidslStr = res.statusCode == 200
+      //       ? res.body
+      //       : await rootBundle.loadString( // fallback to bundled assets
+      //           'assets/uidsl/screens/${widget.screenName}.json');
+      // } catch (_) {
+      //   uidslStr = await rootBundle.loadString( // fallback on network error
+      //       'assets/uidsl/screens/${widget.screenName}.json');
+      // }
+      // ──────────────────────────────────────────────────────────
       final uidslStr = await rootBundle
           .loadString('assets/uidsl/screens/${widget.screenName}.json');
       final json       = jsonDecode(uidslStr) as Map<String, dynamic>;
