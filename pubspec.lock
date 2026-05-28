@@ -312,7 +312,7 @@ packages:
     description:
       path: shellapp_runtime_client
       ref: main
-      resolved-ref: "0a41c2dbc51852219a3963f68328f0dc84f81267"
+      resolved-ref: a3373da31f83b1ef85f946b504946ae4d7cd02ca
       url: "https://github.com/ease-link/FlutterShell.git"
     source: git
     version: "0.1.0"
