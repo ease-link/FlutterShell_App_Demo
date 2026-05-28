@@ -169,35 +169,36 @@ PM / デザイナー：JSON に "toggleFavorite" と書くだけ
 flowchart TD
     A[main] --> B[ShellAppRuntime.init]
     B --> C[runApp]
-    C --> D[MainScreen initState]
-    D --> E[FunctionActions.initialState]
-    E --> F[rootBundle.loadString main.json]
+    C --> D[DynamicScreen initState]
+    D --> F[rootBundle.loadString main.json]
     F --> G[jsonDecode UIDSL取得]
-    G --> H[ShellAppRuntime.execute]
+    G --> E{onInitアクションあり?}
+    E -->|初回ロード| EE[AppActions.handle onInit]
+    EE --> EF[FunctionActions.call init]
+    EF --> EG[onStateChanged 初期state一括セット]
+    EG --> F
+    E -->|初期化済み| H[ShellAppRuntime.execute stateあり]
 
     H --> I{Native DLL利用可能?}
-    I -->|Yes Desktop| J[Go DLL bind解決 visibility評価]
-    I -->|No Web| K[生UIDSLをそのまま使用]
+    I -->|Yes Desktop/Mobile| J[Go DLL bind値を解決]
+    I -->|No Web| K[生UIDSLをstateと共に使用]
 
     J --> L[setState _resolvedWidgetに格納]
     K --> L
 
-    L --> M[build Scaffold]
+    L --> M[WidgetFactoryLite.build stateを渡す]
     M --> N{root type}
-    N -->|navigation_rail| O[NavigationRailWidget]
-    N -->|other| P[WidgetFactoryLite.build]
+    N -->|navigation_rail| O[NavigationRail 左サイドバー]
+    N -->|other| P[_buildNode typeでswitch]
 
-    O --> Q[NavigationRail 左サイドバー]
-    O --> R[選択タブの子ノード WidgetFactoryLite.build]
+    O --> Q[selectedNavIndexで子ノード切替]
+    Q --> P
 
-    R --> S[_buildNode typeでswitch]
-    P --> S
-
-    S -->|column row| T[Column Row children再帰]
-    S -->|text| U[Text currentWordをテンプレート補間]
-    S -->|card| V[Card children再帰]
-    S -->|button| W[ElevatedButton onPressedにonActionをセット]
-    S -->|list_view| X[ListView favorites展開]
+    P -->|column row| T[Column Row children再帰]
+    P -->|text| U[Text currentWordをテンプレート補間]
+    P -->|card| V[Card children再帰]
+    P -->|button| W[ElevatedButton onPressedにonActionをセット]
+    P -->|list_view| X[ListView favorites展開]
 
     T & U & V & W & X --> Y[画面表示]
 
@@ -234,25 +235,25 @@ iOS / Android / Web / Desktop
 
 ```
 lib/
-  actions/                         # エンジニアの領域：ロジック
-    app_actions.dart
-    function_actions.dart
-    api_actions.dart
-    storage_actions.dart
-  screens/                         # フレームワーク層
-    main_screen.dart
-  shellapp/                        # UIDSL → Widget 変換エンジン
-    widget_factory_lite.dart
-  plugins/
-    navigation_rail_widget.dart
-  main.dart
+  main.dart                        # ルーティングのみ。触らなくていい（25行）
+  actions/                         # ✅ エンジニアの領域：ロジック・API・処理を実装
+    app_actions.dart               #    アクションディスパッチャ
+    function_actions.dart          #    ビジネスロジック（単語生成・お気に入り）
+    api_actions.dart               #    外部 API 呼び出し
+    storage_actions.dart           #    ローカルストレージ
+  screens/                         # 🔧 フレームワーク：触らなくてOK
+    dynamic_screen.dart            #    1ファイルで全画面を表示
+  shellapp/                        # 🔧 フレームワーク：触らなくてOK
+    widget_factory_lite.dart       #    UIDSL → Flutter Widget 変換エンジン
 
 assets/
-  uidsl/screens/                   # デザイナー・PM の領域
-    main.json
+  uidsl/screens/                   # ✅ デザイナー・PM の領域：JSON で画面を定義
+    main.json                      #    UI 定義（UIDSL）← 画面が増えてもここに JSON を追加するだけ
 ```
 
 > 「誰がどこを触るか」をディレクトリ構造で明確化。
+
+画面が30個になっても `lib/screens/` は **1ファイルのまま**。増えるのは `lib/actions/` だけ。
 
 ---
 

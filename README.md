@@ -175,35 +175,36 @@ Engineers can organize `lib/actions/` however they want. The structure is up to 
 flowchart TD
     A[main] --> B[ShellAppRuntime.init]
     B --> C[runApp]
-    C --> D[MainScreen initState]
-    D --> E[FunctionActions.initialState]
-    E --> F[rootBundle.loadString main.json]
+    C --> D[DynamicScreen initState]
+    D --> F[rootBundle.loadString main.json]
     F --> G[jsonDecode load UIDSL]
-    G --> H[ShellAppRuntime.execute]
+    G --> E{onInit action?}
+    E -->|first load| EE[AppActions.handle onInit]
+    EE --> EF[FunctionActions.call init]
+    EF --> EG[onStateChanged spread initialState]
+    EG --> F
+    E -->|already initialized| H[ShellAppRuntime.execute with state]
 
     H --> I{Native DLL available?}
-    I -->|Yes Desktop| J[Go DLL resolve bind and visibility]
-    I -->|No Web| K[use raw UIDSL as-is]
+    I -->|Yes Desktop/Mobile| J[Go DLL resolve bind values]
+    I -->|No Web| K[use raw UIDSL with state]
 
     J --> L[setState store resolvedWidget]
     K --> L
 
-    L --> M[build Scaffold]
+    L --> M[WidgetFactoryLite.build with state]
     M --> N{root type}
-    N -->|navigation_rail| O[NavigationRailWidget]
-    N -->|other| P[WidgetFactoryLite.build]
+    N -->|navigation_rail| O[NavigationRail sidebar]
+    N -->|other| P[_buildNode switch on type]
 
-    O --> Q[NavigationRail sidebar]
-    O --> R[selected tab child WidgetFactoryLite.build]
+    O --> Q[show child by selectedNavIndex]
+    Q --> P
 
-    R --> S[_buildNode switch on type]
-    P --> S
-
-    S -->|column row| T[Column Row recurse children]
-    S -->|text| U[Text interpolate currentWord]
-    S -->|card| V[Card recurse children]
-    S -->|button| W[ElevatedButton set onPressed to onAction]
-    S -->|list_view| X[ListView expand favorites]
+    P -->|column row| T[Column Row recurse children]
+    P -->|text| U[Text interpolate currentWord]
+    P -->|card| V[Card recurse children]
+    P -->|button| W[ElevatedButton onPressed fires onAction]
+    P -->|list_view| X[ListView expand favorites]
 
     T & U & V & W & X --> Y[screen rendered]
 
@@ -242,25 +243,25 @@ Clone it. Run it. Then read the code.
 
 ```
 lib/
+  main.dart                        # Routing only. No need to touch. (25 lines)
   actions/                         # ✅ Engineer's zone: implement logic, API, processing
     app_actions.dart               #    action dispatcher
     function_actions.dart          #    business logic (word generation, favorites)
     api_actions.dart               #    external API calls
     storage_actions.dart           #    local storage
   screens/                         # 🔧 Framework: no need to touch
-    main_screen.dart               #    state management, UIDSL loading
+    dynamic_screen.dart            #    renders all screens from UIDSL (1 file for all screens)
   shellapp/                        # 🔧 Framework: no need to touch
     widget_factory_lite.dart       #    UIDSL → Flutter Widget engine
-  plugins/                         # 🔧 Framework: no need to touch
-    navigation_rail_widget.dart    #    NavigationRail plugin
-  main.dart                        # 🔧 Framework: no need to touch
 
 assets/
   uidsl/screens/                   # ✅ Designer / PM's zone: define screens in JSON
-    main.json                      #    UI definition (UIDSL)
+    main.json                      #    UI definition (UIDSL) ← add more screens here as JSON
 ```
 
 > The age-old question — "wait, whose job is this?" — answered by the directory structure.
+
+Even with 30 screens, `lib/screens/` stays at **one file**. Only `lib/actions/` grows.
 
 ---
 
