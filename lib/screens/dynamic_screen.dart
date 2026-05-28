@@ -1,3 +1,4 @@
+// フレームワーク。1ファイルで全画面を表示
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

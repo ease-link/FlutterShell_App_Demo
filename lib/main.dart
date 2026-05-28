@@ -1,3 +1,4 @@
+// ルーティングは自動設定。触らなくていい
 import 'package:flutter/material.dart';
 import 'package:shellapp_runtime/shellapp_runtime.dart';
 import 'screens/dynamic_screen.dart';
@@ -17,9 +18,7 @@ class ShellApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/main',
       routes: {
-        '/main':      (context) => const DynamicScreen(screenName: 'main'),
-        '/generator': (context) => const DynamicScreen(screenName: 'generator'),
-        '/favorites': (context) => const DynamicScreen(screenName: 'favorites'),
+        '/main': (context) => const DynamicScreen(screenName: 'main'),
       },
     );
   }

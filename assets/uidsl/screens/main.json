@@ -110,11 +110,11 @@
                 "props": {
                   "label": "Like",
                   "icon": "favorite",
-                  "variant": "elevated",
-                  "action": {
-                    "type": "functionCall",
-                    "name": "toggleFavorite"
-                  }
+                  "variant": "elevated"
+                },
+                "action": {
+                  "type": "functionCall",
+                  "name": "toggleFavorite"
                 },
                 "children": []
               },
@@ -132,12 +132,12 @@
                 "props": {
                   "variant": "elevated",
                   "label": "Next",
-                  "icon": "skip_next",
-                  "action": {
-                    "type": "functionCall",
-                    "name": "getNext",
-                    "storeKey": "currentWord"
-                  }
+                  "icon": "skip_next"
+                },
+                "action": {
+                  "type": "functionCall",
+                  "name": "getNext",
+                  "storeKey": "currentWord"
                 },
                 "children": []
               }
