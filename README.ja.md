@@ -1,3 +1,5 @@
+> 🇺🇸 [English version here](README.md)
+
 # ウィジェットを1つも書かずに、Flutter アプリを作れたらどうなる？
 
 ---
@@ -216,8 +218,8 @@ flowchart TD
 > ShellApp の基本思想を体験できます。
 
 ```bash
-git clone https://github.com/ease-link/ShellApp_Codelabs_flutter.git
-cd ShellApp_Codelabs_flutter
+git clone https://github.com/ease-link/FlutterShell_App_Demo.git
+cd FlutterShell_App_Demo
 flutter run
 ```
 

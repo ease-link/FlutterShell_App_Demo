@@ -1,3 +1,5 @@
+> 🇯🇵 [日本語版はこちら](README.ja.md)
+
 # What if you could build a Flutter app without writing a single Widget?
 
 ---
@@ -222,8 +224,8 @@ flowchart TD
 > All screens are defined in JSON (`assets/uidsl/screens/main.json`).
 
 ```bash
-git clone https://github.com/ease-link/ShellApp_Codelabs_flutter.git
-cd ShellApp_Codelabs_flutter
+git clone https://github.com/ease-link/FlutterShell_App_Demo.git
+cd FlutterShell_App_Demo
 flutter run
 ```
 
