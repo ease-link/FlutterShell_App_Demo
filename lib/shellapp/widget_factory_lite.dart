@@ -965,7 +965,7 @@ class WidgetFactoryLite {
 
       // ─── Navigation ───────────────────────────────────────────────
       case 'navigation_rail':
-        final navBind = node['bind']?.toString();
+        final navBind = (node['bind'] ?? node['bind_key'])?.toString();
         final navResolved = resolvedValue ?? (navBind != null ? (state?[navBind]) : null);
         final navIndex = (navResolved is int
                 ? navResolved
