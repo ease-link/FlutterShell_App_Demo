@@ -1,6 +1,7 @@
 {
   "name": "Main",
   "scrollable": false,
+  "onInit": { "type": "functionCall", "name": "init" },
   "root": {
     "id": "root",
     "type": "navigation_rail",

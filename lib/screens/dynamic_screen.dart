@@ -18,6 +18,7 @@ class _DynamicScreenState extends State<DynamicScreen> {
   Map<String, dynamic> _state = {};
   bool _scrollable = true;
   String? _error;
+  bool _didInit = false;
 
   @override
   void initState() {
@@ -32,7 +33,23 @@ class _DynamicScreenState extends State<DynamicScreen> {
       final json       = jsonDecode(uidslStr) as Map<String, dynamic>;
       final uidsl      = (json['root'] ?? json) as Map<String, dynamic>;
       final scrollable = (json['scrollable'] as bool?) ?? true;
-      final result     = ShellAppRuntime.execute(uidsl: uidsl, state: _state);
+
+      // onInit: 初回ロード時に1度だけ実行するアクション
+      if (!_didInit) {
+        _didInit = true;
+        final onInit = json['onInit'] as Map<String, dynamic>?;
+        if (onInit != null) {
+          AppActions.handle(
+            onInit,
+            state:          _state,
+            onStateChanged: _onStateChanged,
+            onNavigate:     (_) {},
+          );
+          return; // _onStateChanged → _load() が再実行される
+        }
+      }
+
+      final result = ShellAppRuntime.execute(uidsl: uidsl, state: _state);
       if (result.ok && result.widget != null) {
         setState(() {
           _resolvedWidget = result.widget;
@@ -104,6 +121,7 @@ class _DynamicScreenState extends State<DynamicScreen> {
                   _resolvedWidget!,
                   onStateChanged: _onStateChanged,
                   onAction:       _onAction,
+                  state:          _state,
                 ),
               )
             : SizedBox.expand(
@@ -111,6 +129,7 @@ class _DynamicScreenState extends State<DynamicScreen> {
                   _resolvedWidget!,
                   onStateChanged: _onStateChanged,
                   onAction:       _onAction,
+                  state:          _state,
                 ),
               ),
       ),

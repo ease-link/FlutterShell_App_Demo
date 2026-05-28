@@ -33,6 +33,9 @@ class FunctionActions {
     Map<String, dynamic> state = const {},
   }) async {
     switch (name) {
+      case 'init':
+        return initialState();
+
       case 'getNext':
         return _randomPair();
 
