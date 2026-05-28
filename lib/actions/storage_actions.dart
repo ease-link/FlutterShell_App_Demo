@@ -1,6 +1,3 @@
-// ローカル保存系。
-// UIDSL の storage.save / storage.load アクションから呼び出される。
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StorageActions {

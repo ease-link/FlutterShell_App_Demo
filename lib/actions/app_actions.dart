@@ -1,10 +1,7 @@
-// UIDSL の action を受け取る窓口。
-// 各アクションタイプを責務別ファイルに振り分けるだけ。
-
+import 'package:flutter/foundation.dart';
 import 'function_actions.dart';
 import 'api_actions.dart';
 import 'storage_actions.dart';
-import 'navigation_actions.dart';
 
 typedef StateChangedCallback = void Function(String key, dynamic value);
 
@@ -21,7 +18,8 @@ class AppActions {
     switch (type) {
       case 'functionCall':
         final name     = (action['name'] ?? params['name']) as String?;
-        final args     = (action['args'] ?? params['args'] as Map<String, dynamic>?) ?? {};
+        final rawArgs = action['args'] ?? params['args'];
+        final args    = (rawArgs as Map?)?.map((k, v) => MapEntry(k.toString(), v)) ?? <String, dynamic>{};
         final storeKey = (action['storeKey'] ?? params['storeKey']) as String?;
         if (name != null) {
           FunctionActions.call(name, args, state: state).then((result) {
@@ -30,7 +28,7 @@ class AppActions {
             } else if (storeKey != null && result != null) {
               onStateChanged(storeKey, result);
             }
-          });
+          }).catchError((e) { debugPrint('functionCall error: $e'); return null; });
         }
         break;
 
@@ -47,7 +45,7 @@ class AppActions {
             } else {
               if (errorKey != null) onStateChanged(errorKey, 'API call failed');
             }
-          });
+          }).catchError((e) { debugPrint('apiCall error: $e'); return null; });
         }
         break;
 
@@ -65,7 +63,7 @@ class AppActions {
             if (storeKey != null && value != null) {
               onStateChanged(storeKey, value);
             }
-          });
+          }).catchError((e) { debugPrint('storage.load error: $e'); return null; });
         }
         break;
 

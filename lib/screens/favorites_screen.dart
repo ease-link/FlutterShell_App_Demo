@@ -13,7 +13,7 @@ class FavoritesScreen extends StatefulWidget {
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
   Map<String, dynamic>? _resolvedWidget;
-  Map<String, dynamic> _state = {};
+  final Map<String, dynamic> _state = {};
   bool _scrollable = true;
   String? _error;
 

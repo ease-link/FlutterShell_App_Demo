@@ -1,10 +1,5 @@
 import 'dart:math';
 
-// UIDSL の functionCall アクションから name で呼び出される。
-// getNext        → String  (storeKey: "currentWord" で格納)
-// toggleFavorite → Map {"favorites":[], "favoritesCount": N} (複数キー更新)
-// 戻り値が Map のとき app_actions.dart が各キーを onStateChanged で展開する。
-
 class FunctionActions {
   static final _rng = Random();
 

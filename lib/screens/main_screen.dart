@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:shellapp_runtime/shellapp_runtime.dart';
 import '../shellapp/widget_factory_lite.dart';
 import '../actions/app_actions.dart';
+import '../actions/function_actions.dart';
+import '../plugins/navigation_rail_widget.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -13,7 +15,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   Map<String, dynamic>? _resolvedWidget;
-  Map<String, dynamic> _state = {};
+  final Map<String, dynamic> _state = FunctionActions.initialState();
   bool _scrollable = true;
   String? _error;
 
@@ -27,10 +29,11 @@ class _MainScreenState extends State<MainScreen> {
     try {
       final uidslStr =
           await rootBundle.loadString('assets/uidsl/screens/main.json');
-      final json     = jsonDecode(uidslStr) as Map<String, dynamic>;
-      final uidsl    = (json['root'] ?? json) as Map<String, dynamic>;
+      final json       = jsonDecode(uidslStr) as Map<String, dynamic>;
+      final uidsl      = (json['root'] ?? json) as Map<String, dynamic>;
       final scrollable = (json['scrollable'] as bool?) ?? true;
-      final result   = ShellAppRuntime.execute(uidsl: uidsl, state: _state);
+      final result     = ShellAppRuntime.execute(uidsl: uidsl, state: _state);
+      if (!mounted) return;
       if (result.ok && result.widget != null) {
         setState(() {
           _resolvedWidget = result.widget;
@@ -47,12 +50,16 @@ class _MainScreenState extends State<MainScreen> {
         setState(() => _error = result.error ?? 'Unknown error');
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() => _error = e.toString());
     }
   }
 
   void _onStateChanged(String key, dynamic value) {
-    setState(() => _state[key] = value);
+    _state[key] = value;
+    if (key == 'favorites' && value is List) {
+      _state['favoritesCount'] = value.length;
+    }
     _load();
   }
 
@@ -65,12 +72,31 @@ class _MainScreenState extends State<MainScreen> {
         if (to == '__back__') {
           Navigator.of(context).pop();
         } else if (to.startsWith('__replace__:')) {
-          Navigator.of(context).pushReplacementNamed('/${to.substring(12)}');
+          Navigator.of(context).pushReplacementNamed('/${to.substring(12)}', arguments: _state);
         } else {
-          Navigator.of(context).pushNamed('/$to');
+          Navigator.of(context).pushNamed('/$to', arguments: _state);
         }
       },
     );
+  }
+
+  Widget _buildWidget(Map<String, dynamic> node) {
+    switch (node['type'] as String? ?? '') {
+      case 'navigation_rail':
+        return NavigationRailWidget(
+          node:           node,
+          state:          _state,
+          onStateChanged: _onStateChanged,
+          onAction:       _onAction,
+        );
+      default:
+        return WidgetFactoryLite.build(
+          node,
+          onStateChanged: _onStateChanged,
+          onAction:       _onAction,
+          state:          _state,
+        );
+    }
   }
 
   Color? _rootBgColor(Map<String, dynamic> node) {
@@ -97,20 +123,8 @@ class _MainScreenState extends State<MainScreen> {
       backgroundColor: _rootBgColor(_resolvedWidget!),
       body: SafeArea(
         child: _scrollable
-            ? SingleChildScrollView(
-                child: WidgetFactoryLite.build(
-                  _resolvedWidget!,
-                  onStateChanged: _onStateChanged,
-                  onAction:       _onAction,
-                ),
-              )
-            : SizedBox.expand(
-                child: WidgetFactoryLite.build(
-                  _resolvedWidget!,
-                  onStateChanged: _onStateChanged,
-                  onAction:       _onAction,
-                ),
-              ),
+            ? SingleChildScrollView(child: _buildWidget(_resolvedWidget!))
+            : SizedBox.expand(child: _buildWidget(_resolvedWidget!)),
       ),
     );
   }

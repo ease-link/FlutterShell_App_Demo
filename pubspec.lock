@@ -62,6 +62,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_lints:
+    dependency: "direct dev"
+    description:
+      name: flutter_lints
+      sha256: "5398f14efa795ffb7a33e9b6a08798b26a180edac4ad7db3f231e40f82ce11e1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.0"
   flutter_svg:
     dependency: "direct main"
     description:
@@ -123,6 +131,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.1"
+  lints:
+    dependency: transitive
+    description:
+      name: lints
+      sha256: c35bb79562d980e9a453fc715854e1ed39e24e7d0297a880ef54e17f9874a9d7
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.1.1"
   material_color_utilities:
     dependency: transitive
     description:
@@ -294,9 +310,11 @@ packages:
   shellapp_runtime:
     dependency: "direct main"
     description:
-      path: shellapp_runtime
-      relative: true
-    source: path
+      path: shellapp_runtime_client
+      ref: main
+      resolved-ref: "0a41c2dbc51852219a3963f68328f0dc84f81267"
+      url: "https://github.com/ease-link/FlutterShell.git"
+    source: git
     version: "0.1.0"
   sky_engine:
     dependency: transitive

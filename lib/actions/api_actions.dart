@@ -1,7 +1,3 @@
-// API コール系。
-// UIDSL の apiCall アクションから endpoint / method / body で呼び出される。
-// 戻り値は app_actions.dart で storeKey に格納され、UI が自動再描画される。
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 

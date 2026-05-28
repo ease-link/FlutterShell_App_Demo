@@ -5,24 +5,24 @@
     "id": "root",
     "type": "column",
     "props": {
-      "padding": {
-        "left": 20,
-        "right": 20
-      },
-      "crossAxisAlignment": "center",
       "mainAxisAlignment": "center",
-      "background": "#F3F3F3"
+      "background": "#F3F3F3",
+      "padding": {
+        "right": 20,
+        "left": 20
+      },
+      "crossAxisAlignment": "center"
     },
     "children": [
       {
         "id": "hint",
         "type": "text",
         "props": {
-          "value": "A random idea:",
           "style": {
-            "fontSize": 14,
-            "color": "#49454F"
-          }
+            "color": "#49454F",
+            "fontSize": 14
+          },
+          "value": "A random idea:"
         },
         "children": []
       },
@@ -39,14 +39,14 @@
         "type": "card",
         "props": {
           "padding": {
-            "left": 32,
             "right": 32,
-            "top": 20,
-            "bottom": 20
+            "left": 32,
+            "bottom": 20,
+            "top": 20
           },
-          "borderRadius": 12,
           "elevation": 4,
-          "color": "#6750A4"
+          "color": "#6750A4",
+          "borderRadius": 12
         },
         "children": [
           {
@@ -54,13 +54,13 @@
             "type": "text",
             "bind": "currentWord",
             "props": {
-              "value": "{{currentWord}}",
               "style": {
-                "weight": "bold",
-                "fontSize": 28,
                 "letterSpacing": 1.5,
-                "color": "#F3EFF4"
-              }
+                "color": "#F3EFF4",
+                "weight": "bold",
+                "fontSize": 28
+              },
+              "value": "{{currentWord}}"
             },
             "children": []
           }
@@ -86,11 +86,11 @@
             "type": "button",
             "props": {
               "label": "Like",
+              "variant": "elevated",
               "action": {
                 "name": "toggleFavorite",
                 "type": "action"
               },
-              "variant": "elevated",
               "icon": "favorite"
             },
             "children": []
@@ -107,12 +107,12 @@
             "id": "next_btn",
             "type": "button",
             "props": {
-              "variant": "elevated",
-              "label": "Next",
               "action": {
                 "name": "getNext",
                 "type": "action"
               },
+              "variant": "elevated",
+              "label": "Next",
               "icon": "skip_next"
             },
             "children": []

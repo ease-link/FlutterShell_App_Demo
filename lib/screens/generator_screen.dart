@@ -13,7 +13,7 @@ class GeneratorScreen extends StatefulWidget {
 
 class _GeneratorScreenState extends State<GeneratorScreen> {
   Map<String, dynamic>? _resolvedWidget;
-  Map<String, dynamic> _state = {};
+  final Map<String, dynamic> _state = {};
   bool _scrollable = true;
   String? _error;
 

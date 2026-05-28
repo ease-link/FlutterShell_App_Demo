@@ -1,6 +1,6 @@
 // ShellApp Widget Factory Lite
-// DLL が解決済みの UIDSL ノードを Flutter Widget に変換するだけの純レンダラー。
-// bind / access / visibility の計算は DLL 側で完結している。
+// Pure renderer: converts resolved UIDSL nodes into Flutter widgets.
+// bind / access / visibility are pre-computed by the runtime before reaching here.
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -47,8 +47,7 @@ class WidgetFactoryLite {
     Widget result;
 
     // ---------------------------------------------------------------
-    // selfTapTypes — これらは自身でタップを処理するため GestureDetector で
-    // 二重ラップしない
+    // selfTapTypes — these handle taps internally; skip GestureDetector wrap
     // ---------------------------------------------------------------
     const selfTapTypes = {
       'button', 'text_field', 'number_field',
@@ -58,8 +57,12 @@ class WidgetFactoryLite {
     switch (type) {
       // ─── Display ──────────────────────────────────────────────────
       case 'text':
-        final val =
-            resolvedValue?.toString() ?? props['value']?.toString() ?? '';
+        final tmpl = props['value']?.toString() ?? '';
+        final isPureBinding = RegExp(r'^\{\{[\w.]+\}\}$').hasMatch(tmpl);
+        final val = (tmpl.contains('{{') && state != null &&
+                (resolvedValue == null || !isPureBinding))
+            ? _interpolate(tmpl, state)
+            : (resolvedValue?.toString() ?? tmpl);
         result = Text(
           val,
           style: _textStyle(props['style']),
@@ -114,7 +117,7 @@ class WidgetFactoryLite {
           color:     _color(props['color']),
           thickness: (props['thickness'] as num?)?.toDouble(),
           indent:    (props['indent'] as num?)?.toDouble(),
-          endIndent: (props['indent'] as num?)?.toDouble(),
+          endIndent: (props['endIndent'] as num?)?.toDouble(),
         );
         break;
 
@@ -172,7 +175,7 @@ class WidgetFactoryLite {
 
       // ─── Input ────────────────────────────────────────────────────
       case 'card':
-        // card は _applyCommonStyle の width/height ラップを skip
+        // card handles its own size; skip width/height in _applyCommonStyle
         Widget cardResult = Card(
           elevation: (props['elevation'] as num?)?.toDouble() ?? 2.0,
           color: _color(props['color']),
@@ -183,7 +186,7 @@ class WidgetFactoryLite {
                 : const SizedBox.shrink(),
           ),
         );
-        // card では width/height は内部では不要（外部スタイルのみ margin/opacity）
+        // apply only margin/opacity externally
         return _applyCommonStyleSkipSize(cardResult, props);
 
       case 'button':
@@ -300,18 +303,18 @@ class WidgetFactoryLite {
         break;
 
       case 'radio':
-        result = Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Radio<dynamic>(
-              value: props['value'],
-              groupValue: resolvedValue,
-              onChanged: bindKey != null && onStateChanged != null
-                  ? (v) => onStateChanged(bindKey, v)
-                  : null,
-            ),
-            Text(props['label']?.toString() ?? ''),
-          ],
+        result = RadioGroup<dynamic>(
+          groupValue: resolvedValue,
+          onChanged: (v) {
+            if (bindKey != null && onStateChanged != null) onStateChanged(bindKey, v);
+          },
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Radio<dynamic>(value: props['value']),
+              Text(props['label']?.toString() ?? ''),
+            ],
+          ),
         );
         break;
 
@@ -325,38 +328,38 @@ class WidgetFactoryLite {
         final rgRadios = rgItems.map((item) => Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Radio<String>(
-              value:      item,
-              groupValue: rgSelected,
-              onChanged: bindKey != null && onStateChanged != null
-                  ? (v) => onStateChanged(bindKey, v)
-                  : null,
-            ),
+            Radio<String>(value: item),
             Text(item),
           ],
         )).toList();
-        result = Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (rgLabel != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Text(rgLabel),
-              ),
-            rgIsHorizontal
-                ? Wrap(children: rgRadios)
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: rgRadios,
-                  ),
-          ],
+        result = RadioGroup<String>(
+          groupValue: rgSelected ?? '',
+          onChanged: (v) {
+            if (bindKey != null && onStateChanged != null && v != null) onStateChanged(bindKey, v);
+          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (rgLabel != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Text(rgLabel),
+                ),
+              rgIsHorizontal
+                  ? Wrap(children: rgRadios)
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: rgRadios,
+                    ),
+            ],
+          ),
         );
         break;
 
       case 'dropdown':
-        final items = (props['items'] as List? ?? []).cast<String>();
+        final items = (props['items'] as List? ?? []).map((e) => e.toString()).toList();
         result = DropdownButton<String>(
           value: resolvedValue as String?,
           items: items
@@ -406,7 +409,9 @@ class WidgetFactoryLite {
                   lastDate: DateTime(2100),
                 );
                 if (picked != null && bindKey != null && onStateChanged != null) {
-                  onStateChanged(bindKey, picked.toIso8601String());
+                  if (ctx.mounted) {
+                    onStateChanged(bindKey, picked.toIso8601String());
+                  }
                 }
               },
               child: InputDecorator(
@@ -505,7 +510,7 @@ class WidgetFactoryLite {
                 child:  w);
           }).toList(),
         );
-        // width 未指定・height 未指定のとき横幅いっぱいに広げる（コアと同じ）
+        // stretch to full width when no explicit size is set
         if (props['width'] == null && props['height'] == null) {
           result = SizedBox(width: double.infinity, child: stackWidget);
         } else {
@@ -514,7 +519,7 @@ class WidgetFactoryLite {
         break;
 
       case 'container':
-        // container は width/height を内部で処理するため _applyCommonStyle では skip
+        // container handles width/height internally; skip in _applyCommonStyle
         final cw    = (props['width']  as num?)?.toDouble();
         final ch    = (props['height'] as num?)?.toDouble();
         final cmaxW = (props['maxWidth']  as num?)?.toDouble();
@@ -523,8 +528,8 @@ class WidgetFactoryLite {
         final childList = children();
         Widget? innerChild;
         if (childList.isNotEmpty) {
-          // maxWidth があるコンテナ（パネル/カード系）は center、
-          // それ以外のフル幅コンテナは stretch（デフォルト）
+          // constrained containers (panel/card) center their children;
+          // full-width containers stretch (default)
           final innerCross = cmaxW != null
               ? CrossAxisAlignment.center
               : CrossAxisAlignment.stretch;
@@ -719,7 +724,6 @@ class WidgetFactoryLite {
                 : null,
           );
         }).toList();
-        final tbBg        = _color(props['backgroundColor']);
         final tbLabelColor = _color(props['labelColor']);
         final tbIndicator  = _color(props['indicatorColor']);
         result = DefaultTabController(
@@ -1018,7 +1022,7 @@ class WidgetFactoryLite {
     }
 
     // ---------------------------------------------------------------
-    // on_tap GestureDetector ラップ（selfTapTypes 以外）
+    // Wrap with GestureDetector for on_tap (non-selfTapTypes only)
     // ---------------------------------------------------------------
     if (!selfTapTypes.contains(type)) {
       final onTapRaw = node['on_tap'] ?? props['onTap'];
@@ -1032,9 +1036,8 @@ class WidgetFactoryLite {
     }
 
     // ---------------------------------------------------------------
-    // _applyCommonStyle（width/height/margin/opacity）
-    // container / card はここに到達しない（上で return している）
-    // expanded / flexible も layout parent が管理するので skip
+    // Apply common style (width/height/margin/opacity).
+    // container/card return early above; expanded/flexible are managed by parent.
     // ---------------------------------------------------------------
     if (type != 'expanded' && type != 'flexible') {
       result = _applyCommonStyle(result, props);
@@ -1044,8 +1047,7 @@ class WidgetFactoryLite {
   }
 
   // ---------------------------------------------------------------
-  // list_view アイテムテンプレートにアイテム値を再帰注入
-  // bind: "." のノードに resolved_value をセットする
+  // Recursively inject item value into list_view item templates.
   // ---------------------------------------------------------------
   static Map<String, dynamic> _injectItem(Map<String, dynamic> node, dynamic value) {
     final n = Map<String, dynamic>.from(node);
@@ -1059,12 +1061,12 @@ class WidgetFactoryLite {
   }
 
   // ---------------------------------------------------------------
-  // 共通スタイル適用 — width/height/margin/opacity
+  // Common style: width / height / margin / opacity
   // ---------------------------------------------------------------
   static Widget _applyCommonStyle(Widget w, Map<String, dynamic> props) {
     final width   = (props['width']   as num?)?.toDouble();
     final height  = (props['height']  as num?)?.toDouble();
-    final opacity = (props['opacity'] as num?)?.toDouble()?.clamp(0.0, 1.0);
+    final opacity = (props['opacity'] as num?)?.toDouble().clamp(0.0, 1.0);
     final margin  = _edgeInsets(props['margin']);
 
     if (width != null || height != null) {
@@ -1079,9 +1081,9 @@ class WidgetFactoryLite {
     return w;
   }
 
-  // container / card — size は内部処理済みなので margin/opacity のみ
+  // container / card — size handled internally; apply only margin/opacity
   static Widget _applyCommonStyleSkipSize(Widget w, Map<String, dynamic> props) {
-    final opacity = (props['opacity'] as num?)?.toDouble()?.clamp(0.0, 1.0);
+    final opacity = (props['opacity'] as num?)?.toDouble().clamp(0.0, 1.0);
     final margin  = _edgeInsets(props['margin']);
 
     if (margin != null) {
@@ -1094,7 +1096,7 @@ class WidgetFactoryLite {
   }
 
   // ---------------------------------------------------------------
-  // _textFieldDecoration — variant / borderRadius 対応
+  // Input decoration — variant / borderRadius
   // ---------------------------------------------------------------
   static InputDecoration _textFieldDecoration(
       Map<String, dynamic> props, String? error) {
@@ -1147,7 +1149,7 @@ class WidgetFactoryLite {
   }
 
   // ---------------------------------------------------------------
-  // 日付フォーマット
+  // Date formatting
   // ---------------------------------------------------------------
   static String _formatDate(String iso) {
     try {
@@ -1159,7 +1161,7 @@ class WidgetFactoryLite {
   }
 
   // ---------------------------------------------------------------
-  // 色・スタイル・配置ユーティリティ
+  // Color / style / alignment utilities
   // ---------------------------------------------------------------
   static Color? _color(dynamic v) {
     if (v == null) return null;
@@ -1255,7 +1257,7 @@ class WidgetFactoryLite {
   }
 
   // ---------------------------------------------------------------
-  // FontAwesome アイコンマップ
+  // FontAwesome icon map
   // ---------------------------------------------------------------
   static FaIconData _parseFaIconData(String name) {
     const map = <String, FaIconData>{
@@ -1646,7 +1648,7 @@ class WidgetFactoryLite {
   }
 
   // ---------------------------------------------------------------
-  // Material アイコンマップ
+  // Material icon map
   // ---------------------------------------------------------------
   static IconData _parseIconData(String name) {
     const map = <String, IconData>{
@@ -1731,10 +1733,16 @@ class WidgetFactoryLite {
     };
     return map[name] ?? Icons.help_outline;
   }
+
+  static String _interpolate(String template, Map<String, dynamic> state) =>
+      template.replaceAllMapped(RegExp(r'\{\{(\w+)\}\}'), (m) {
+        final key = m.group(1)!;
+        return state[key]?.toString() ?? m.group(0)!;
+      });
 }
 
 // =================================================================
-// _InputField — text_field / number_field 用 StatefulWidget
+// _InputField — StatefulWidget for text_field / number_field
 // =================================================================
 class _InputField extends StatefulWidget {
   final String? label;
@@ -1814,7 +1822,7 @@ class _InputFieldState extends State<_InputField> {
 }
 
 // =================================================================
-// _SearchField — search_field 用 StatefulWidget
+// _SearchField — StatefulWidget for search_field
 // =================================================================
 class _SearchField extends StatefulWidget {
   final String  placeholder;

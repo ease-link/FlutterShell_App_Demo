@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:shellapp_runtime/shellapp_runtime.dart';
 import 'screens/main_screen.dart';
 import 'screens/generator_screen.dart';
 import 'screens/favorites_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await ShellAppRuntime.init();
   runApp(const ShellApp());
 }
 
