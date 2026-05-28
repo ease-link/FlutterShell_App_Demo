@@ -223,6 +223,8 @@ flowchart TD
 > **This project contains no Dart UI code.**  
 > All screens are defined in JSON (`assets/uidsl/screens/main.json`).
 
+**Requirements:** Flutter 3.38.0 or later
+
 ```bash
 git clone https://github.com/ease-link/FlutterShell_App_Demo.git
 cd FlutterShell_App_Demo

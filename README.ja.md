@@ -217,6 +217,8 @@ flowchart TD
 > このデモでは「UI を JSON で定義し、Flutter が描画する」という  
 > ShellApp の基本思想を体験できます。
 
+**動作環境:** Flutter 3.38.0 以上
+
 ```bash
 git clone https://github.com/ease-link/FlutterShell_App_Demo.git
 cd FlutterShell_App_Demo
